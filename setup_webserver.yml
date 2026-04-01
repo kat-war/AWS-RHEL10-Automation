@@ -1,0 +1,64 @@
+---
+- name: Configure RHEL 10 Web Servers
+  hosts: rhel_servers
+  become: yes
+
+  tasks:
+    - name: Update all system packages
+      dnf:
+        name: "*"
+        state: latest
+
+    - name: Ensure Apache (httpd) is installed
+      dnf:
+        name: httpd
+        state: present
+
+    - name: Create a new cybersecurity admin user
+      user:
+        name: cyber_admin
+        comment: "Project Admin"
+        shell: /bin/bash
+
+    - name: Create a custom landing page
+      copy:
+        content: "<h1>Welcome to RHEL 10 - Managed by Ansible & Terraform</h1>"
+        dest: /var/www/html/index.html
+
+    - name: Start and enable Apache service
+      service:
+        name: httpd
+        state: started
+        enabled: yes
+
+    - name: Install firewalld package
+      dnf:
+        name: firewalld
+        state: present
+
+    - name: Ensure firewalld is running
+      service:
+        name: firewalld
+        state: started
+        enabled: yes
+
+    - name: Install Python firewall library
+      dnf:
+        name: python3-firewall
+        state: present
+
+    - name: Allow HTTP traffic in firewalld
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
+
+    - name: Allow HTTP traffic in firewalld
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled
+        immediate: yes
+        zone: public
